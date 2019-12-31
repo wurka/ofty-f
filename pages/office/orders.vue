@@ -1,5 +1,5 @@
 <template>
-  <div class="layout">
+  <div class="layout" :class="{hidden: notLoaded, visible: !notLoaded}">
     <div class="header">
       this will be header later
     </div>
@@ -17,17 +17,29 @@
       </div>
       <div class="content-panel">
         <div>
-          <input type="text" :value="counter">
+          <label>
+            counter
+            <input type="text" :value="$store.state.counter">
+          </label>
         </div>
         <input type="button" value="+" @click="increment">
+        <div class="order" v-for="order in $store.state.orders" :key="order.id">
+          one order
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+    import {Module as $store} from "vuex"
+    import axios from 'axios'
     export default {
         name: "orders",
+        data: ()=>({
+            notLoaded: true,
+            csrf: null
+        }),
         methods: {
           increment() {
             this.$store.commit('increment')
@@ -35,14 +47,26 @@
         },
         computed: {
           counter: function () {
-            return this.store.counter;
+            return this.$store.state.counter;
           }
+        },
+        mounted() {
+            this.notLoaded = false;
+            axios
+                .get(this.$store.state.backend + "csrf")
+                .then((ans) => {this.csrf = ans.data; alert(this.csrf);})
+            //this.csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         }
     }
 </script>
 
 <style lang="sass">
   @import url('http://127.0.0.1:9000/static/fonts/stylesheet.css')
+  .hidden
+    opacity: 0
+  .visible
+    opacity: 1
+    transition: 0.3s
   $pageBackground: #f5f5f5
   html
     background: #f5f5f5

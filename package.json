@@ -14,7 +14,12 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "nuxt": "^2.0.0"
+    "node-sass": "^4.13.0",
+    "nuxt": "^2.0.0",
+    "sass-loader": "^8.0.0",
+    "store": "^2.0.12",
+    "vue": "latest",
+    "vuex": "latest"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
