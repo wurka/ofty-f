@@ -2,6 +2,7 @@
   <div class="layout" :class="{hidden: notLoaded, visible: !notLoaded}">
     <div class="header">
       this will be header later
+      <input type="button" value="login me" @click="openLoginDialog">
     </div>
     <div class="my-body">
       <div class="link-panel">
@@ -28,22 +29,36 @@
         </div>
       </div>
     </div>
+    <div class="shield" v-if="loginOpened"></div>
+    <transition name="fade">
+      <LoginDialog @closing="closeLoginDialog" @success="closeLoginDialog" v-if="loginOpened"/>
+    </transition>
   </div>
 </template>
 
 <script>
     import {Module as $store} from "vuex"
     import axios from 'axios'
+    import LoginDialog from "../../components/LoginDialog";
+
     export default {
         name: "orders",
+        components: {LoginDialog},
         data: ()=>({
             notLoaded: true,
-            csrf: null
+            csrf: null,
+            loginOpened: true
         }),
         methods: {
-          increment() {
-            this.$store.commit('increment')
-          }
+            increment() {
+              this.$store.commit('increment')
+            },
+            openLoginDialog() {
+                this.loginOpened = true;
+            },
+            closeLoginDialog() {
+                this.loginOpened = false;
+            }
         },
         computed: {
           counter: function () {
@@ -54,7 +69,7 @@
             this.notLoaded = false;
             axios
                 .get(this.$store.state.backend + "csrf")
-                .then((ans) => {this.csrf = ans.data; alert(this.csrf);})
+                .then((ans) => {this.$store.state.csrf = ans.data;})
             //this.csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         }
     }
@@ -93,4 +108,16 @@
   .content-panel
     flex-grow: 1
     border: 1px solid #000
+  .shield
+    background: #F5F5F5
+    opacity: 0.8
+    position: absolute
+    width: 100vw
+    height: 100vh
+    top: 0
+    left: 0
+  .fade-enter-active, .fade-leave-active
+    transition: opacity .5s
+  .fade-enter, .fade-leave-to
+    opacity: 0
 </style>

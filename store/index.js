@@ -6,6 +6,7 @@ Vue.use(Vuex);
 const store = () => new Vuex.Store({
   state: {
     counter: 0,
+    csrf: undefined,
     backend: "http://localhost:9000/",
     orders: [{
       id: 0,
