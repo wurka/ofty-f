@@ -1,7 +1,12 @@
 <template>
   <div class="layout" :class="{hidden: notLoaded, visible: !notLoaded}">
     <div class="header">
-      this will be header later
+      <div class="not-logged" v-if="$store.state.user.isAnonymous">
+        <span>Ты ещё не на сайте.</span><u @click="openLoginDialog">Зайдешь?</u>
+      </div>
+      <div class="logged" v-if="! $store.state.user.isAnonymous">
+        Привет, {{ $store.state.user.username }}. Рады тебя видеть.
+      </div>
       <input type="button" value="login me" @click="openLoginDialog">
     </div>
     <div class="my-body">
@@ -71,6 +76,8 @@
                 .get(this.$store.state.backend + "csrf")
                 .then((ans) => {this.$store.state.csrf = ans.data;})
             //this.csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            axios
+                .get(this.$store.state.backend + "account/about-me")
         }
     }
 </script>

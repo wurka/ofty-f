@@ -7,6 +7,10 @@ const store = () => new Vuex.Store({
   state: {
     counter: 0,
     csrf: undefined,
+    user: {
+      username: "anonymous",
+      isAnonymous: true
+    },
     backend: "http://localhost:9000/",
     orders: [{
       id: 0,
