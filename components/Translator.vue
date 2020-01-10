@@ -14,7 +14,7 @@
             },
             translate(text) {
                 let BreakException = {},
-                    ans = text,
+                    ans = 'ошибка на сервере',
                     dictionary = this.dictionary;
 
                 try {

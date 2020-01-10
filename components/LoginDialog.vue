@@ -6,7 +6,7 @@
         {{ errorText }}
       </div>
       <div class="line">
-        <label for="email">Почта</label>
+        <label for="email">Почта или логин</label>
         <input type="text" id="email" v-model="loginName">
       </div>
       <div class="line">
@@ -14,7 +14,7 @@
         <input type="password" id="password" v-model="password">
       </div>
       <div class="line buttons">
-        <span>Напомнить пароль</span>
+        <span onclick="alert('Такой же как везде у тебя пароль, не строй тут из себя...')">Напомнить пароль</span>
         <input type="button" value="Отмена" @click="closeMe">
         <input type="button" value="Войти" @click="login">
       </div>
@@ -29,7 +29,7 @@
         name: "LoginDialog",
         components: {Translator},
         data() {return {
-            noError: false,
+            noError: true,
             errorText: "Неизвестная ошибка",
             loginName: "",
             password: ""
@@ -61,8 +61,12 @@
                     )
                     .then((resp)=>{vm.$emit('success')})
                     .catch((resp)=>{
+                      if (resp.response) {
                         this.errorText = vm.$refs.translator.translate(resp.response.data);
-                        this.noError = false;})
+                      } else {
+                        this.errorText = "Ой. Похоже, сервер сейчас недоступен =("
+                      }
+                      this.noError = false;})
             }
         }
     }
@@ -76,7 +80,7 @@
     background: white
     top: 0
     left: 50vw
-    margin: 30vh 0 0 -375px
+    margin: 10vh 0 0 -375px
     box-sizing: border-box
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25)
     font-family: Philosopher,serif

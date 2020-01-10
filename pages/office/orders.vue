@@ -7,7 +7,8 @@
       <div class="logged" v-if="! $store.state.user.isAnonymous">
         Привет, {{ $store.state.user.username }}. Рады тебя видеть.
       </div>
-      <input type="button" value="login me" @click="openLoginDialog">
+      <input type="button" value="login me" @click="openLoginDialog" v-if="$store.state.user.isAnonymous">
+      <input type="button" value="выйти" @click="logout" v-if="!$store.state.user.isAnonymous">
     </div>
     <div class="my-body">
       <div class="link-panel">
@@ -36,7 +37,7 @@
     </div>
     <div class="shield" v-if="loginOpened"></div>
     <transition name="fade">
-      <LoginDialog @closing="closeLoginDialog" @success="closeLoginDialog" v-if="loginOpened"/>
+      <LoginDialog @closing="closeLoginDialog" @success="loginSuccess" v-if="loginOpened"/>
     </transition>
   </div>
 </template>
@@ -52,18 +53,53 @@
         data: ()=>({
             notLoaded: true,
             csrf: null,
-            loginOpened: true
+            loginOpened: false
         }),
         methods: {
-            increment() {
-              this.$store.commit('increment')
-            },
-            openLoginDialog() {
-                this.loginOpened = true;
-            },
-            closeLoginDialog() {
-                this.loginOpened = false;
-            }
+          increment() {
+            this.$store.commit('increment')
+          },
+          openLoginDialog() {
+              this.loginOpened = true;
+          },
+          closeLoginDialog() {
+              this.loginOpened = false;
+          },
+          logout() {
+            let vm = this;
+            axios
+              .post(this.$store.state.backend + 'account/logout', {},
+                {
+                  headers: {
+                    "X-CSRFToken": vm.$store.state.csrf
+                  }
+                })
+              .then(this.aboutMe)
+              .catch((data)=>{
+                console.warn("не получилось выйти");
+              });
+          },
+          aboutMe() {
+            axios
+              .get(this.$store.state.backend + "csrf")
+              .then((ans) => {this.$store.state.csrf = ans.data;});
+            //this.csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            axios
+              .get(this.$store.state.backend + "account/about-me")
+              .then((ans) => {
+                console.log(ans.data);
+                this.$store.state.user.username = ans.data['username'];
+                this.$store.state.user.isAnonymous = ans.data['anonymous'];
+              });
+          },
+          loginSuccess() {
+            this.closeLoginDialog();
+            this.aboutMe();
+          },
+          getMyOrders() {
+            axios
+              .get(this.$store.state.backend + "")
+          }
         },
         computed: {
           counter: function () {
@@ -72,12 +108,7 @@
         },
         mounted() {
             this.notLoaded = false;
-            axios
-                .get(this.$store.state.backend + "csrf")
-                .then((ans) => {this.$store.state.csrf = ans.data;})
-            //this.csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            axios
-                .get(this.$store.state.backend + "account/about-me")
+            this.aboutMe()
         }
     }
 </script>
