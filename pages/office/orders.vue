@@ -75,8 +75,10 @@
                   }
                 })
               .then(this.aboutMe)
-              .catch((data)=>{
-                console.warn("не получилось выйти");
+              .catch((resp)=>{
+                if (resp.response) {
+                  console.warn("не получилось выйти: " + resp.response.data);
+                }
               });
           },
           aboutMe() {
@@ -98,7 +100,15 @@
           },
           getMyOrders() {
             axios
-              .get(this.$store.state.backend + "")
+              .get(this.$store.state.backend + "orders/get-my-orders", {params: {
+                  page: 1
+                }})
+              .then((data)=>{console.log(data)})
+              .catch((resp)=>{
+                if (resp.response) {
+                  console.warn(resp.response.data);
+                }
+              })
           }
         },
         computed: {
@@ -107,11 +117,12 @@
           }
         },
         mounted() {
-            this.notLoaded = false;
-            this.aboutMe()
+          this.notLoaded = false;
+          this.aboutMe();
+          this.getMyOrders();
         }
     }
-</script>
+</script>г
 
 <style lang="sass">
   @import url('http://127.0.0.1:9000/static/fonts/stylesheet.css')
